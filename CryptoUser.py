@@ -1,5 +1,18 @@
 from random import randint
+from base64 import b64encode
+from base64 import b64decode
 import CryptoDef
+
+
+def bytes_to_str(b):
+    res = ""
+    for i in b:
+        res += chr(i)
+    return res
+
+
+def str_to_bytes(s):
+    return bytes(s, 'raw_unicode_escape')
 
 
 def str_to_list(message: str):
@@ -139,6 +152,7 @@ class cryptoUser(object):
     def Vernam_encrypt_message(self, message):
         return [message[i] ^ cryptoUser.keys[i] for i in range(len(message))]
 
+
 def send_message_as_RSA(user1: cryptoUser(), user2: cryptoUser(), message):
     # user1.generate_rsa_parametrs()
     # print(f"{user1.user_name} generate rsa parametrs")
@@ -156,7 +170,6 @@ def send_message_as_RSA(user1: cryptoUser(), user2: cryptoUser(), message):
     print(f"{user2.user_name} read message {decryptMes} as '{list_to_str(encryptMes)}'")
 
 
-
 def send_message_as_ElGamal(user1: cryptoUser(), user2: cryptoUser(), message):
     cryptoUser.generate_parametrs()
     user1.init_deffi_helfman_key()
@@ -172,21 +185,19 @@ def send_message_as_ElGamal(user1: cryptoUser(), user2: cryptoUser(), message):
           f"Privae_key = {hex(user2.get_my_private_key())}\n"
           f"Public_key = {hex(user2.get_my_public_key())}\n"
           f"Common_key = {hex(user2.get_my_common_key())}\n")
-    
+
     mes = str_to_list(message)
     decryptMes = []
     for i in mes:
         decryptMes.append(user1.decrypt_message_as_ElGamal(i))
-        
+
     print(f"{user1.user_name} send message '{message}' as {decryptMes}")
     encryptMes = []
     for i in decryptMes:
         encryptMes.append(user2.encrypt_message_as_ElGamal(i))
 
     print(f"{user2.user_name} read message {decryptMes} as '{list_to_str(encryptMes)}'")
-    
-    
-     
+
 
 def send_message_as_DeffiHelfman_Ceaser(user1: cryptoUser(), user2: cryptoUser(), message):
     cryptoUser.generate_parametrs()
@@ -209,6 +220,7 @@ def send_message_as_DeffiHelfman_Ceaser(user1: cryptoUser(), user2: cryptoUser()
     print(f"{user1.user_name} send mesage '{message}' as {mes}")
     print(f"{user2.user_name} read mesage {mes} as '{user2.encrypt_message_as_Ceasar(mes)}'")
 
+
 def send_message_as_Verman(user1: cryptoUser(), user2: cryptoUser(), message):
     cryptoUser.generate_Vernam_keys(len(message))
     mes = str_to_list(message)
@@ -217,6 +229,19 @@ def send_message_as_Verman(user1: cryptoUser(), user2: cryptoUser(), message):
     encryptMes = user2.Vernam_encrypt_message(decryptMes)
     print(f"{user2.user_name} read mesage {decryptMes} as '{list_to_str(encryptMes)}'")
 
+def send_file_as_Verman(user1: cryptoUser(), user2: cryptoUser(), file, path):
+    message = bytes_to_str(open(path + "/" + file, "rb").read())
+    mes = str_to_list(message)
+    cryptoUser.generate_Vernam_keys(len(mes))
+    decryptMes = user1.Vernam_decrypt_message(mes)
+    encryptMes = user2.Vernam_encrypt_message(decryptMes)
+    print(f"{user1.user_name} send mesage \n{message}\n as \n{decryptMes}")
+    print(f"{user2.user_name} read mesage \n{decryptMes}\n as \n{str_to_bytes(list_to_str(encryptMes))}")
+    decryptFile = open(path + "/" + "decrypt_Verman_" + file, "wb")
+    encryptFile = open(path + "/" + "encrypt_Verman_" + file, "wb")
+
+    decryptFile.write(str_to_bytes(list_to_str(decryptMes)))
+    encryptFile.write(str_to_bytes(list_to_str(encryptMes)))
 
 
 
