@@ -1,5 +1,6 @@
 from random import randint
 
+
 def gcd(a, b):
     u = [a, 1, 0]
     v = [b, 0, 1]
@@ -9,6 +10,7 @@ def gcd(a, b):
         u = v
         v = t
     return u
+
 
 def gcd_light(a, b):
     if b == 0:
@@ -46,3 +48,25 @@ def generate_friend_simple_numper(p):
         result = generate_simple_number(2, p)
 
     return result
+
+
+def to_bin(x):
+    s = ""
+    while x != 0 and x != -1 :
+        s += str(x % 2)
+        x //= 2
+        print(x)
+
+    return s
+
+
+def mega_pow(x, n, y):
+    bin_n = to_bin(n)
+    result = 1
+    list = []
+    for i in range(0, len(bin_n)):
+        if bin_n[i] == '1':
+            result *= x
+        x = (x * x) % y
+
+    return result % y
